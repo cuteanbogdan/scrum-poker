@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
+import { v4 as uuidv4 } from "uuid";
 
 const HomePage: React.FC = () => {
   const [room, setRoom] = useState<string>("");
@@ -15,8 +16,7 @@ const HomePage: React.FC = () => {
   };
 
   const handleCreate = () => {
-    // Generate a unique room ID or use the newRoom value as room ID
-    const roomId = "to implement";
+    const roomId = uuidv4();
     router.push(`/rooms/${roomId}`);
   };
 

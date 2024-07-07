@@ -4,7 +4,7 @@ import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 
 type RoomData = {
-  users: string[];
+  users: { id: string; name: string }[];
   votes: { [key: string]: number };
 };
 
@@ -23,24 +23,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
     io.on("connection", (socket) => {
       console.log(`New connection: ${socket.id}`);
 
-      socket.on("joinRoom", (roomId: string) => {
-        if (!rooms[roomId]) {
-          rooms[roomId] = { users: [], votes: {} };
-          console.log(`Room created: ${roomId}`);
+      socket.on(
+        "joinRoom",
+        ({ roomId, userName }: { roomId: string; userName: string }) => {
+          if (!rooms[roomId]) {
+            rooms[roomId] = { users: [], votes: {} };
+            console.log(`Room created: ${roomId}`);
+          }
+          rooms[roomId].users.push({ id: socket.id, name: userName });
+          socket.join(roomId);
+          io.to(roomId).emit("roomData", rooms[roomId]);
+          console.log(
+            `Socket ${socket.id} (${userName}) joined room ${roomId}`
+          );
+          console.log(
+            `Current users in room ${roomId}: ${rooms[roomId].users
+              .map((user) => user.name)
+              .join(", ")}`
+          );
         }
-        rooms[roomId].users.push(socket.id);
-        socket.join(roomId);
-        io.to(roomId).emit("roomData", rooms[roomId]);
-        console.log(`Socket ${socket.id} joined room ${roomId}`);
-        console.log(
-          `Current users in room ${roomId}: ${rooms[roomId].users.join(", ")}`
-        );
-      });
+      );
 
       socket.on("leaveRoom", (roomId: string) => {
         if (rooms[roomId]) {
           rooms[roomId].users = rooms[roomId].users.filter(
-            (id) => id !== socket.id
+            (user) => user.id !== socket.id
           );
           if (rooms[roomId].users.length === 0) {
             delete rooms[roomId];
@@ -49,9 +56,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
             io.to(roomId).emit("roomData", rooms[roomId]);
             console.log(`Socket ${socket.id} left room ${roomId}`);
             console.log(
-              `Current users in room ${roomId}: ${rooms[roomId].users.join(
-                ", "
-              )}`
+              `Current users in room ${roomId}: ${rooms[roomId].users
+                .map((user) => user.name)
+                .join(", ")}`
             );
           }
         }
@@ -77,7 +84,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
         for (const roomId in rooms) {
           if (rooms.hasOwnProperty(roomId)) {
             rooms[roomId].users = rooms[roomId].users.filter(
-              (id) => id !== socket.id
+              (user) => user.id !== socket.id
             );
             if (rooms[roomId].users.length === 0) {
               delete rooms[roomId];
@@ -86,9 +93,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
               io.to(roomId).emit("roomData", rooms[roomId]);
               console.log(`Socket ${socket.id} removed from room ${roomId}`);
               console.log(
-                `Current users in room ${roomId}: ${rooms[roomId].users.join(
-                  ", "
-                )}`
+                `Current users in room ${roomId}: ${rooms[roomId].users
+                  .map((user) => user.name)
+                  .join(", ")}`
               );
             }
           }
