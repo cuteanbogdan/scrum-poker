@@ -18,6 +18,7 @@ const RoomPage = () => {
   const [userName, setUserName] = useState<string>(
     () => `User_${Math.floor(Math.random() * 1000)}`
   );
+  const [users, setUsers] = useState<string[]>([]);
 
   useEffect(() => {
     const socket = socketService.connect();
@@ -34,7 +35,8 @@ const RoomPage = () => {
     socketService.on(
       "roomData",
       (roomData: { users: { id: string; name: string }[] }) => {
-        console.log("Room data received:", roomData);
+        const userNames = roomData.users.map((user) => user.name);
+        setUsers(userNames);
       }
     );
 
@@ -50,22 +52,29 @@ const RoomPage = () => {
   };
 
   const results = Object.values(votes);
-  const users = Object.keys(votes);
-
-  console.log("Current users:", users);
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header roomId={roomId} />
-      <div className="flex flex-1 flex-col items-center justify-center mt-8">
-        <Table message="Scrum Poker" users={users} />
-        <VotesDisplay votes={votes} />
-        <ResultDisplay results={results} />
+      <div className="flex flex-1 mt-8">
+        <div className="flex flex-col items-center justify-start w-1/3 p-4">
+          <VotesDisplay votes={votes} />
+          <ResultDisplay results={results} />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center w-1/3">
+          <Table message="Scrum Poker" users={users} />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-start w-1/3 p-4">
+          <div className="flex flex-col items-center justify-center h-full">
+            <h2 className="text-xl font-bold mb-4">Chat</h2>
+            <div className="flex-1 w-full bg-white p-4 rounded-lg shadow">
+              Continut chat
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="fixed bottom-0 left-0 w-full bg-white p-4">
-        <VoteOptions onVote={handleVote} activeVote={activeVote} />
-        <Footer />
-      </div>
+      <VoteOptions onVote={handleVote} activeVote={activeVote} />
+      <Footer />
     </div>
   );
 };

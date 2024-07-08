@@ -13,13 +13,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ results }) => {
   return (
     <div className="mt-4 p-4 bg-gray-100 rounded-lg">
       <p className="text-xl font-bold mb-2">Average: {average}</p>
-      <ul>
-        {results.map((result, index) => (
-          <li key={index} className="py-1">
-            {result}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
