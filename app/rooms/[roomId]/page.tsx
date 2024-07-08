@@ -52,8 +52,10 @@ const RoomPage = () => {
   }, [roomId, userName]);
 
   const handleVote = (vote: number) => {
-    socketService.emit("vote", { room: roomId, user: userName, vote });
-    setActiveVote(vote);
+    if (!votesRevealed && vote !== activeVote) {
+      socketService.emit("vote", { room: roomId, user: userName, vote });
+      setActiveVote(vote);
+    }
   };
 
   const handleRevealVotes = () => {
@@ -81,6 +83,8 @@ const RoomPage = () => {
                 : ""
             }
             users={users}
+            votes={votes}
+            votesRevealed={votesRevealed}
             showRevealButton={userVotes.length > 0 && !votesRevealed}
             onRevealVotes={handleRevealVotes}
           />
@@ -94,7 +98,11 @@ const RoomPage = () => {
           </div>
         </div>
       </div>
-      <VoteOptions onVote={handleVote} activeVote={activeVote} />
+      <VoteOptions
+        onVote={handleVote}
+        activeVote={activeVote}
+        votesRevealed={votesRevealed}
+      />
       <Footer />
     </div>
   );

@@ -4,6 +4,8 @@ import User from "../user/User";
 interface TableProps {
   message: string;
   users: string[];
+  votes: { [key: string]: number };
+  votesRevealed: boolean;
   showRevealButton: boolean;
   onRevealVotes: () => void;
 }
@@ -11,6 +13,8 @@ interface TableProps {
 const Table: React.FC<TableProps> = ({
   message,
   users,
+  votes,
+  votesRevealed,
   showRevealButton,
   onRevealVotes,
 }) => {
@@ -52,7 +56,13 @@ const Table: React.FC<TableProps> = ({
               className="flex flex-col items-center justify-center h-full space-y-2"
             >
               {cellUsers.map((user, userIndex) => (
-                <User key={userIndex} name={user} />
+                <User
+                  key={userIndex}
+                  name={user}
+                  hasVoted={votes.hasOwnProperty(user)}
+                  vote={votes[user]}
+                  votesRevealed={votesRevealed}
+                />
               ))}
             </div>
           );
