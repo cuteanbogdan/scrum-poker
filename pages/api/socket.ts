@@ -6,6 +6,7 @@ import { Server as NetServer } from "http";
 type RoomData = {
   users: { id: string; name: string }[];
   votes: { [key: string]: number };
+  revealVotes: boolean;
 };
 
 const rooms: { [key: string]: RoomData } = {};
@@ -27,7 +28,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
         "joinRoom",
         ({ roomId, userName }: { roomId: string; userName: string }) => {
           if (!rooms[roomId]) {
-            rooms[roomId] = { users: [], votes: {} };
+            rooms[roomId] = { users: [], votes: {}, revealVotes: false };
             console.log(`Room created: ${roomId}`);
           }
           rooms[roomId].users.push({ id: socket.id, name: userName });
@@ -78,6 +79,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
           }
         }
       );
+
+      socket.on("revealVotes", (roomId: string) => {
+        if (rooms[roomId]) {
+          rooms[roomId].revealVotes = true;
+          io.to(roomId).emit("votesRevealed");
+          console.log(`Votes revealed in room ${roomId}`);
+        }
+      });
 
       socket.on("disconnect", () => {
         console.log(`Socket ${socket.id} disconnected`);

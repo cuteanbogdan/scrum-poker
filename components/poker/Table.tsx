@@ -4,9 +4,16 @@ import User from "../user/User";
 interface TableProps {
   message: string;
   users: string[];
+  showRevealButton: boolean;
+  onRevealVotes: () => void;
 }
 
-const Table: React.FC<TableProps> = ({ message, users }) => {
+const Table: React.FC<TableProps> = ({
+  message,
+  users,
+  showRevealButton,
+  onRevealVotes,
+}) => {
   const gridSize = 3;
   const totalCells = gridSize * gridSize;
   const centerIndex = Math.floor(totalCells / 2);
@@ -14,9 +21,7 @@ const Table: React.FC<TableProps> = ({ message, users }) => {
   const numUsersPerCell = Math.ceil(users.length / (totalCells - 1));
 
   return (
-    <div
-      className={`grid grid-cols-${gridSize} grid-rows-${gridSize} gap-4 w-full h-full`}
-    >
+    <div className="grid grid-cols-3 grid-rows-3 gap-4 w-full h-full">
       {Array.from({ length: totalCells }).map((_, index) => {
         if (index === centerIndex) {
           return (
@@ -24,14 +29,22 @@ const Table: React.FC<TableProps> = ({ message, users }) => {
               key={index}
               className="flex items-center justify-center bg-blue-200 rounded-[10%] h-full col-span-1 row-span-1"
             >
-              <div className="text-xl font-bold text-center">{message}</div>
+              {showRevealButton ? (
+                <button
+                  onClick={onRevealVotes}
+                  className="p-2 bg-blue-500 text-white rounded"
+                >
+                  Reveal Votes
+                </button>
+              ) : (
+                <div className="text-xl font-bold text-center">{message}</div>
+              )}
             </div>
           );
         } else {
-          const startIdx =
+          const userIndex =
             (index < centerIndex ? index : index - 1) * numUsersPerCell;
-          const endIdx = startIdx + numUsersPerCell;
-          const cellUsers = users.slice(startIdx, endIdx);
+          const cellUsers = users.slice(userIndex, userIndex + numUsersPerCell);
 
           return (
             <div
