@@ -55,7 +55,7 @@ const RoomPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header roomId={roomId} />
+      <Header roomId={roomId} usersNumber={users.length} />
       <div className="flex flex-1 mt-8">
         <div className="flex flex-col items-center justify-start w-1/3 p-4">
           <VotesDisplay votes={votes} />
