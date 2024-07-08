@@ -45,6 +45,12 @@ const RoomPage = () => {
       setVotesRevealed(true);
     });
 
+    socketService.on("roundReset", () => {
+      setVotes({});
+      setActiveVote(null);
+      setVotesRevealed(false);
+    });
+
     return () => {
       socket.emit("leaveRoom", roomId);
       socketService.disconnect();
@@ -60,6 +66,10 @@ const RoomPage = () => {
 
   const handleRevealVotes = () => {
     socketService.emit("revealVotes", roomId);
+  };
+
+  const handleResetRound = () => {
+    socketService.emit("resetRound", roomId);
   };
 
   const results = Object.values(votes);
@@ -87,6 +97,7 @@ const RoomPage = () => {
             votesRevealed={votesRevealed}
             showRevealButton={userVotes.length > 0 && !votesRevealed}
             onRevealVotes={handleRevealVotes}
+            onResetRound={handleResetRound}
           />
         </div>
         <div className="flex flex-1 flex-col items-center justify-start w-1/3 p-4">

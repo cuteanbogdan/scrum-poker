@@ -8,6 +8,7 @@ interface TableProps {
   votesRevealed: boolean;
   showRevealButton: boolean;
   onRevealVotes: () => void;
+  onResetRound: () => void;
 }
 
 const Table: React.FC<TableProps> = ({
@@ -17,6 +18,7 @@ const Table: React.FC<TableProps> = ({
   votesRevealed,
   showRevealButton,
   onRevealVotes,
+  onResetRound,
 }) => {
   const gridSize = 3;
   const totalCells = gridSize * gridSize;
@@ -31,7 +33,7 @@ const Table: React.FC<TableProps> = ({
           return (
             <div
               key={index}
-              className="flex items-center justify-center bg-blue-200 rounded-[10%] h-full col-span-1 row-span-1"
+              className="flex flex-col items-center justify-center bg-blue-200 rounded-[10%] h-full col-span-1 row-span-1"
             >
               {showRevealButton ? (
                 <button
@@ -42,6 +44,14 @@ const Table: React.FC<TableProps> = ({
                 </button>
               ) : (
                 <div className="text-xl font-bold text-center">{message}</div>
+              )}
+              {votesRevealed && (
+                <button
+                  onClick={onResetRound}
+                  className="mt-4 p-2 bg-red-500 text-white rounded"
+                >
+                  Reset Round
+                </button>
               )}
             </div>
           );

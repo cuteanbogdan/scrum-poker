@@ -88,6 +88,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
         }
       });
 
+      socket.on("resetRound", (roomId: string) => {
+        if (rooms[roomId]) {
+          rooms[roomId].votes = {};
+          rooms[roomId].revealVotes = false;
+          io.to(roomId).emit("roundReset");
+          console.log(`Round reset in room ${roomId}`);
+        }
+      });
+
       socket.on("disconnect", () => {
         console.log(`Socket ${socket.id} disconnected`);
         for (const roomId in rooms) {
