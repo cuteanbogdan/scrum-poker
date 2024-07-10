@@ -10,6 +10,7 @@ import Table from "@/components/poker/Table";
 import Footer from "@/components/common/Footer";
 import socketService from "@/lib/socket";
 import NameModal from "@/components/common/NameModal";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const RoomPage = () => {
   const { roomId } = useParams() as { roomId: string };
@@ -19,6 +20,16 @@ const RoomPage = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [users, setUsers] = useState<string[]>([]);
   const [votesRevealed, setVotesRevealed] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const storedUserName = localStorage.getItem("userName");
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     if (!userName) return;
@@ -54,6 +65,7 @@ const RoomPage = () => {
 
     return () => {
       socket.emit("leaveRoom", roomId);
+      localStorage.removeItem("userName");
       socketService.disconnect();
     };
   }, [roomId, userName]);
@@ -78,7 +90,12 @@ const RoomPage = () => {
 
   const handleSaveUserName = (name: string) => {
     setUserName(name);
+    localStorage.setItem("userName", name);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
