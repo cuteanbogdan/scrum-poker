@@ -4,6 +4,7 @@ import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 import votingHandler from "@/sockets/voting";
 import chatHandler from "@/sockets/chat";
+import roomManagement from "@/sockets/common/roomManagement";
 
 const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
   if (!res.socket.server.io) {
@@ -14,7 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
     });
 
     res.socket.server.io = io;
-
+    roomManagement(io);
     votingHandler(io);
     chatHandler(io);
 

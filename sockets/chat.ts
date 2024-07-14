@@ -1,12 +1,5 @@
 import { Server as ServerIO, Socket } from "socket.io";
-import { rooms } from "./common/roomData";
-
-type ChatMessage = {
-  roomId: string;
-  user: string;
-  message: string;
-  timestamp?: Date;
-};
+import { ChatMessage } from "@/types/chat";
 
 const chatHandler = (io: ServerIO) => {
   io.on("connection", (socket: Socket) => {
@@ -23,10 +16,6 @@ const chatHandler = (io: ServerIO) => {
       console.log(
         `Message received in room ${roomId} from user ${user}: ${message}`
       );
-    });
-
-    socket.on("disconnect", () => {
-      console.log(`Chat disconnected: ${socket.id}`);
     });
   });
 };
