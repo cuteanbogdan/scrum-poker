@@ -1,12 +1,5 @@
 import { Server as ServerIO, Socket } from "socket.io";
-
-type RoomData = {
-  users: { id: string; name: string }[];
-  votes: { [key: string]: number };
-  revealVotes: boolean;
-};
-
-const rooms: { [key: string]: RoomData } = {};
+import { rooms } from "./common/roomData";
 
 const votingHandler = (io: ServerIO) => {
   io.on("connection", (socket: Socket) => {

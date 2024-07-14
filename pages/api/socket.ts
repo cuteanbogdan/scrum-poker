@@ -3,6 +3,7 @@ import { NextApiResponseServerIO } from "@/types/next";
 import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 import votingHandler from "@/sockets/voting";
+import chatHandler from "@/sockets/chat";
 
 const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
   if (!res.socket.server.io) {
@@ -15,6 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIO) => {
     res.socket.server.io = io;
 
     votingHandler(io);
+    chatHandler(io);
 
     console.log("Socket.IO server setup complete");
   } else {
