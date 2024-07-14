@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import useSocket from "@/hooks/useSocket";
 import { useParams } from "next/navigation";
 import Header from "@/components/poker/Header";
 import VoteOptions from "@/components/poker/VoteOptions";
@@ -11,6 +12,8 @@ import Footer from "@/components/common/Footer";
 import socketService from "@/lib/socket";
 import NameModal from "@/components/common/NameModal";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import Chat from "@/components/chat/Chat";
+import { ChatMessage } from "@/types/chat";
 
 const RoomPage = () => {
   const { roomId } = useParams() as { roomId: string };
@@ -19,6 +22,7 @@ const RoomPage = () => {
   const [activeVote, setActiveVote] = useState<number | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [users, setUsers] = useState<string[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [votesRevealed, setVotesRevealed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -31,44 +35,15 @@ const RoomPage = () => {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    if (!userName) return;
-
-    const socket = socketService.connect();
-
-    socket.emit("joinRoom", { roomId, userName });
-
-    socketService.on("voteReceived", (data: { user: string; vote: number }) => {
-      setVotes((prevVotes) => ({
-        ...prevVotes,
-        [data.user]: data.vote,
-      }));
-    });
-
-    socketService.on(
-      "roomData",
-      (roomData: { users: { id: string; name: string }[] }) => {
-        const userNames = roomData.users.map((user) => user.name);
-        setUsers(userNames);
-      }
-    );
-
-    socketService.on("votesRevealed", () => {
-      setVotesRevealed(true);
-    });
-
-    socketService.on("roundReset", () => {
-      setVotes({});
-      setActiveVote(null);
-      setVotesRevealed(false);
-    });
-
-    return () => {
-      socket.emit("leaveRoom", roomId);
-      localStorage.removeItem("userName");
-      socketService.disconnect();
-    };
-  }, [roomId, userName]);
+  useSocket(
+    roomId,
+    userName || "",
+    setMessages,
+    setUsers,
+    setVotes,
+    setVotesRevealed,
+    setActiveVote
+  );
 
   const handleVote = (vote: number) => {
     if (!votesRevealed && vote !== activeVote) {
@@ -126,12 +101,7 @@ const RoomPage = () => {
               />
             </div>
             <div className="flex flex-1 flex-col items-center justify-start w-1/3 p-4">
-              <div className="flex flex-col items-center justify-center h-full">
-                <h2 className="text-xl font-bold mb-4">Chat</h2>
-                <div className="flex-1 w-full bg-white p-4 rounded-lg shadow">
-                  Continut chat
-                </div>
-              </div>
+              <Chat roomId={roomId} userName={userName} messages={messages} />
             </div>
           </div>
           <VoteOptions
