@@ -6,8 +6,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    onSendMessage(message);
-    setMessage("");
+    if (message.trim()) {
+      onSendMessage(message);
+      setMessage("");
+    }
   };
 
   return (
@@ -17,9 +19,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Type your message..."
-        className="flex-1 p-2 border rounded-l-lg"
+        className="flex-1 p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-      <button type="submit" className="p-2 bg-blue-500 text-white rounded-r-lg">
+      <button
+        type="submit"
+        className="p-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition-colors duration-300"
+      >
         Send
       </button>
     </form>
