@@ -1,5 +1,4 @@
 import React from "react";
-import VoteButton from "./VoteButton";
 
 interface VoteOptionsProps {
   onVote: (vote: number) => void;
@@ -21,9 +20,9 @@ const VoteOptions: React.FC<VoteOptionsProps> = ({
           key={value}
           onClick={() => onVote(value)}
           disabled={votesRevealed}
-          className={`p-2 rounded ${
+          className={`p-2 rounded transition-colors duration-300 ${
             activeVote === value ? "bg-green-500" : "bg-blue-500"
-          } text-white`}
+          } text-white hover:bg-green-600 disabled:opacity-50`}
         >
           {value}
         </button>

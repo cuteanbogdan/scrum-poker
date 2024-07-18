@@ -7,13 +7,16 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ roomId, usersNumber }) => {
   const [buttonText, setButtonText] = useState("Copy Invite Link");
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleCopyLink = () => {
     const roomLink = `${window.location.origin}/rooms/${roomId}`;
     navigator.clipboard.writeText(roomLink).then(() => {
       setButtonText("Copied!");
+      setIsCopied(true);
       setTimeout(() => {
         setButtonText("Copy Invite Link");
+        setIsCopied(false);
       }, 2000);
     });
   };
@@ -27,7 +30,11 @@ const Header: React.FC<HeaderProps> = ({ roomId, usersNumber }) => {
         </div>
         <button
           onClick={handleCopyLink}
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-300"
+          className={`py-2 px-4 rounded transition-colors duration-300 ${
+            isCopied
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-blue-500 hover:bg-blue-600"
+          } text-white`}
         >
           {buttonText}
         </button>
