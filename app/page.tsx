@@ -16,7 +16,6 @@ import {
   validate as uuidValidate,
   version as uuidVersion,
 } from "uuid";
-import router from "next/router";
 
 const isValidUUIDv4 = (uuid: string) =>
   uuidValidate(uuid) && uuidVersion(uuid) === 4;
